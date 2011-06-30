@@ -412,7 +412,7 @@ module ActionView
           #  page.hide 'person_29', 'person_9', 'person_0'
           #
           def hide(*ids)
-            call "jQuery(\"#{jquery_ids(ids)}\").show"
+            call "jQuery(\"#{jquery_ids(ids)}\").hide"
             #loop_on_multiple_args 'Element.hide', ids
           end
 
