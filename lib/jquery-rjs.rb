@@ -1,15 +1,15 @@
 require 'rails'
 require 'active_support'
 
-module PrototypeRails
+module JqueryRjs
   class Engine < Rails::Engine
-    initializer 'prototype-rails.initialize' do
+    initializer 'jquery-rjs.initialize' do
       ActiveSupport.on_load(:action_controller) do
-        require 'prototype-rails/on_load_action_controller'
+        require 'jquery-rjs/on_load_action_controller'
       end
 
       ActiveSupport.on_load(:action_view) do
-        require 'prototype-rails/on_load_action_view'
+        require 'jquery-rjs/on_load_action_view'
       end
     end
   end

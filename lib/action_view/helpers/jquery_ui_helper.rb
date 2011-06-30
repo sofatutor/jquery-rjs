@@ -17,7 +17,7 @@ module ActionView
     #
     # See the documentation at http://script.aculo.us for more information on
     # using these helpers in your application.
-    module ScriptaculousHelper
+    module JqueryUiHelper
       TOGGLE_EFFECTS = [:toggle_appear, :toggle_slide, :toggle_blind]
 
       # Returns a JavaScript snippet to be used on the Ajax callbacks for

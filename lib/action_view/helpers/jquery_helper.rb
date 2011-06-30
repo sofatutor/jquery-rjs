@@ -94,7 +94,7 @@ module ActionView
     # == Updating multiple elements
     # See JavaScriptGenerator for information on updating multiple elements
     # on the page in an Ajax response.
-    module PrototypeHelper
+    module JqueryHelper
       CALLBACKS    = Set.new([ :create, :uninitialized, :loading, :loaded,
                        :interactive, :complete, :failure, :success ] +
                        (100..599).to_a)
@@ -235,7 +235,15 @@ module ActionView
               end
             end
           end
-
+          
+          def jquery_id(id) #:nodoc:
+            id.to_s.count('#.*,>+~:[/ ') == 0 ? "##{id}" : id
+          end
+          
+          def jquery_ids(ids) #:nodoc:
+            Array(ids).map{|id| jquery_id(id)}.join(',')
+          end
+          
           # Returns a element reference by finding it through +id+ in the DOM. This element can then be
           # used for further method calls. Examples:
           #
@@ -314,8 +322,9 @@ module ActionView
           #   page.insert_html :bottom, 'list', '<li>Last item</li>'
           #
           def insert_html(position, id, *options_for_render)
-            content = javascript_object_for(render(*options_for_render))
-            record "Element.insert(\"#{id}\", { #{position.to_s.downcase}: #{content} });"
+            call "jQuery(\"#{jquery_id(id)}\").#{position == :top ? 'prepend' : 'append'}", render(*options_for_render)
+            # content = javascript_object_for(render(*options_for_render))
+            # record "Element.insert(\"#{id}\", { #{position.to_s.downcase}: #{content} });"
           end
 
           # Replaces the inner HTML of the DOM element with the given +id+.
@@ -329,7 +338,8 @@ module ActionView
           #   page.replace_html 'person-45', :partial => 'person', :object => @person
           #
           def replace_html(id, *options_for_render)
-            call 'Element.update', id, render(*options_for_render)
+            call "jQuery.(\"#{jquery_id(id)}\").html", render(*options_for_render)
+            # call 'Element.update', id, render(*options_for_render)
           end
 
           # Replaces the "outer HTML" (i.e., the entire element, not just its
@@ -363,7 +373,8 @@ module ActionView
           #   page.replace 'person_45', :partial => 'person', :object => @person
           #
           def replace(id, *options_for_render)
-            call 'Element.replace', id, render(*options_for_render)
+            call "jQuery.(\"#{jquery_id(id)}\").replaceWith", render(*options_for_render)
+            #call 'Element.replace', id, render(*options_for_render)
           end
 
           # Removes the DOM elements with the given +ids+ from the page.
@@ -375,7 +386,8 @@ module ActionView
           #  page.remove 'person_23', 'person_9', 'person_2'
           #
           def remove(*ids)
-            loop_on_multiple_args 'Element.remove', ids
+            call "jQuery(\"#{jquery_ids(ids)}\").remove"
+            #loop_on_multiple_args 'Element.remove', ids
           end
 
           # Shows hidden DOM elements with the given +ids+.
@@ -387,7 +399,8 @@ module ActionView
           #  page.show 'person_6', 'person_13', 'person_223'
           #
           def show(*ids)
-            loop_on_multiple_args 'Element.show', ids
+            call "jQuery(\"#{jquery_ids(ids)}\").show"
+            #loop_on_multiple_args 'Element.show', ids
           end
 
           # Hides the visible DOM elements with the given +ids+.
@@ -399,7 +412,8 @@ module ActionView
           #  page.hide 'person_29', 'person_9', 'person_0'
           #
           def hide(*ids)
-            loop_on_multiple_args 'Element.hide', ids
+            call "jQuery(\"#{jquery_ids(ids)}\").show"
+            #loop_on_multiple_args 'Element.hide', ids
           end
 
           # Toggles the visibility of the DOM elements with the given +ids+.
@@ -411,7 +425,8 @@ module ActionView
           #  page.toggle 'person_14', 'person_12', 'person_23'      # Shows the previously hidden elements
           #
           def toggle(*ids)
-            loop_on_multiple_args 'Element.toggle', ids
+            call "jQuery(\"#{jquery_ids(ids)}\").toggle"
+            #loop_on_multiple_args 'Element.toggle', ids
           end
 
           # Displays an alert dialog with the given +message+.

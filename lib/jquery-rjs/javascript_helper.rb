@@ -1,7 +1,7 @@
 require 'action_view/helpers/javascript_helper'
 
 ActionView::Helpers::JavaScriptHelper.module_eval do
-  include ActionView::Helpers::PrototypeHelper
+  include ActionView::Helpers::JqueryHelper
 
   # Returns a button with the given +name+ text that'll trigger a JavaScript +function+ using the
   # onclick handler.
