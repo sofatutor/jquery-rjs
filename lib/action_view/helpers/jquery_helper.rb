@@ -259,9 +259,9 @@ module ActionView
           def [](id)
             case id
               when String, Symbol, NilClass
-                JavaScriptElementProxy.new(self, id)
+                JavaScript.8.new(self, id)
               else
-                JavaScriptElementProxy.new(self, ActionController::RecordIdentifier.dom_id(id))
+                JavaScript.8.new(self, ActionController::RecordIdentifier.dom_id(id))
             end
           end
 
@@ -702,7 +702,7 @@ module ActionView
 
     class JavaScriptElementProxy < JavaScriptProxy #:nodoc:
       def initialize(generator, id)
-        @id = id
+        @id = id.to_s.count('#.*,>+~:[/ ') == 0 ? "##{id}" : id
         super(generator, "$(#{::ActiveSupport::JSON.encode(id)})")
       end
 
@@ -722,17 +722,25 @@ module ActionView
       end
 
       def replace_html(*options_for_render)
-        call 'update', @generator.send(:render, *options_for_render)
+        call 'html', @generator.send(:render, *options_for_render)
       end
 
       def replace(*options_for_render)
-        call 'replace', @generator.send(:render, *options_for_render)
+        call 'replaceWith', @generator.send(:render, *options_for_render)
       end
 
       def reload(options_for_replace = {})
-        replace(options_for_replace.merge({ :partial => @id.to_s }))
+        replace(options_for_replace.merge({ :partial => @id.to_s.sub(/^#/,'') }))
+      end
+      
+      def value()
+        call 'val()'
       end
 
+      def value=(value)
+        call 'val', value
+      end
+      
     end
 
     class JavaScriptVariableProxy < JavaScriptProxy #:nodoc:
