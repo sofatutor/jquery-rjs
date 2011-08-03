@@ -259,9 +259,9 @@ module ActionView
           def [](id)
             case id
               when String, Symbol, NilClass
-                JavaScript.8.new(self, id)
+                JavaScriptElementProxy.new(self, id)
               else
-                JavaScript.8.new(self, ActionController::RecordIdentifier.dom_id(id))
+                JavaScriptElementProxy.new(self, ActionController::RecordIdentifier.dom_id(id))
             end
           end
 
@@ -702,7 +702,8 @@ module ActionView
 
     class JavaScriptElementProxy < JavaScriptProxy #:nodoc:
       def initialize(generator, id)
-        @id = id.to_s.count('#.*,>+~:[/ ') == 0 ? "##{id}" : id
+        id = id.to_s.count('#.*,>+~:[/ ') == 0 ? "##{id}" : id
+        @id = id
         super(generator, "$(#{::ActiveSupport::JSON.encode(id)})")
       end
 
@@ -740,7 +741,7 @@ module ActionView
       def value=(value)
         call 'val', value
       end
-      
+
     end
 
     class JavaScriptVariableProxy < JavaScriptProxy #:nodoc:
