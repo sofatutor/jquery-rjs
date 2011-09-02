@@ -1,5 +1,6 @@
 require 'abstract_unit'
 require 'pathname'
+require 'securerandom'
 
 ActionController.add_renderer :simon do |says, options|
   self.content_type  = Mime::TEXT
@@ -161,10 +162,10 @@ class RenderOtherTest < ActionController::TestCase
   end
 
   def test_enum_rjs_test
-    ActiveSupport::SecureRandom.stubs(:base64).returns("asdf")
+    SecureRandom.stubs(:base64).returns("asdf")
     get :enum_rjs_test
     body = %{
-      $$(".product").each(function(value, index) {
+      $(".product").each(function(value, index) {
       new Effect.Highlight(element,{});
       new Effect.Highlight(value,{});
       Sortable.create(value, {onUpdate:function(){new Ajax.Request('/render_other_test/test/order', {asynchronous:true, evalScripts:true, parameters:Sortable.serialize(value) + '&authenticity_token=' + encodeURIComponent('asdf')})}});
@@ -186,7 +187,7 @@ class RenderOtherTest < ActionController::TestCase
   def test_render_custom_code_rjs
     get :render_custom_code_rjs
     assert_response 404
-    assert_equal %(Element.replace("foo", "partial html");), @response.body
+    assert_equal %($("#foo").replaceWith("partial html");), @response.body
   end
 
   def test_render_in_an_rjs_template_should_pick_html_templates_when_available
@@ -200,17 +201,17 @@ class RenderOtherTest < ActionController::TestCase
 
   def test_render_rjs_template_explicitly
     get :render_js_with_explicit_template
-    assert_equal %!Element.remove("person");\nnew Effect.Highlight(\"project-4\",{});!, @response.body
+    assert_equal %!$("#person").remove();\nnew Effect.Highlight(\"project-4\",{});!, @response.body
   end
 
   def test_rendering_rjs_action_explicitly
     get :render_js_with_explicit_action_template
-    assert_equal %!Element.remove("person");\nnew Effect.Highlight(\"project-4\",{});!, @response.body
+    assert_equal %!$("#person").remove();\nnew Effect.Highlight(\"project-4\",{});!, @response.body
   end
 
   def test_render_rjs_with_default
     get :delete_with_js
-    assert_equal %!Element.remove("person");\nnew Effect.Highlight(\"project-4\",{});!, @response.body
+    assert_equal %!$("#person").remove();\nnew Effect.Highlight(\"project-4\",{});!, @response.body
   end
 
   def test_update_page
@@ -237,17 +238,17 @@ class RenderOtherTest < ActionController::TestCase
 
   def test_should_render_html_formatted_partial_with_rjs
     xhr :get, :partial_as_rjs
-    assert_equal %(Element.replace("foo", "partial html");), @response.body
+    assert_equal %($("#foo").replaceWith("partial html");), @response.body
   end
 
   def test_should_render_html_formatted_partial_with_rjs_and_js_format
     xhr :get, :respond_to_partial_as_rjs
-    assert_equal %(Element.replace("foo", "partial html");), @response.body
+    assert_equal %($("#foo").replaceWith("partial html");), @response.body
   end
 
   def test_should_render_with_alternate_default_render
     xhr :get, :render_alternate_default
-    assert_equal %(Element.replace("foo", "partial html");), @response.body
+    assert_equal %($("#foo").replaceWith("partial html");), @response.body
   end
 
   def test_using_custom_render_option

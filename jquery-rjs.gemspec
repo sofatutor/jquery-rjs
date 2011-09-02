@@ -8,6 +8,6 @@ Gem::Specification.new do |spec|
 
   spec.files = %w(README Rakefile Gemfile) + Dir['lib/**/*', 'vendor/**/*', 'test/**/*']
 
-  spec.add_dependency('rails', '>= 3.1.0.beta')
-  spec.add_dependency('jquery-rails')
+  spec.add_dependency('rails', '~> 3.1')
+  spec.add_runtime_dependency('jquery-rails')
 end

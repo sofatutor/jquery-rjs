@@ -105,7 +105,7 @@ ActionDispatch::Assertions::SelectorAssertions.module_eval do
     # Next argument we're looking for is the element identifier. If missing, we pick
     # any element, otherwise we replace it in the statement.
     pattern = Regexp.new(
-      id ? statement.gsub(RJS_ANY_ID, "\"#{id}\"") : statement
+      id ? statement.gsub(RJS_ANY_ID, "\"#{jquery_id(id)}\"") : statement
     )
 
     # Duplicate the body since the next step involves destroying it.
@@ -147,24 +147,32 @@ ActionDispatch::Assertions::SelectorAssertions.module_eval do
   end
   
   protected
+  
+  def jquery_id(id) #:nodoc:
+    id.to_s.count('#.*,>+~:[/ ') == 0 ? "##{id}" : id
+  end
 
   RJS_PATTERN_HTML  = "\"((\\\\\"|[^\"])*)\""
   RJS_ANY_ID        = "\"([^\"])*\""
   RJS_STATEMENTS    = {
-    :chained_replace      => "\\$\\(#{RJS_ANY_ID}\\)\\.replace\\(#{RJS_PATTERN_HTML}\\)",
-    :chained_replace_html => "\\$\\(#{RJS_ANY_ID}\\)\\.update\\(#{RJS_PATTERN_HTML}\\)",
-    :replace_html         => "Element\\.update\\(#{RJS_ANY_ID}, #{RJS_PATTERN_HTML}\\)",
-    :replace              => "Element\\.replace\\(#{RJS_ANY_ID}, #{RJS_PATTERN_HTML}\\)",
+    :chained_replace      => "\\$\\(#{RJS_ANY_ID}\\)\\.replaceWith\\(#{RJS_PATTERN_HTML}\\)",
+    :chained_replace_html => "\\$\\(#{RJS_ANY_ID}\\)\\.html\\(#{RJS_PATTERN_HTML}\\)",
+    :replace_html         => "\\$\\(#{RJS_ANY_ID}\\)\\.html\\(#{RJS_PATTERN_HTML}\\)",
+    :replace              => "\\$\\(#{RJS_ANY_ID}\\)\\.replaceWith\\(#{RJS_PATTERN_HTML}\\)",
     :redirect             => "window.location.href = #{RJS_ANY_ID}"
   }
   [:remove, :show, :hide, :toggle].each do |action|
-    RJS_STATEMENTS[action] = "Element\\.#{action}\\(#{RJS_ANY_ID}\\)"
+    RJS_STATEMENTS[action] = "\\$\\(#{RJS_ANY_ID}\\)\\.#{action}\\(\\)"
   end
   RJS_INSERTIONS = ["top", "bottom", "before", "after"]
-  RJS_INSERTIONS.each do |insertion|
-    RJS_STATEMENTS["insert_#{insertion}".to_sym] = "Element.insert\\(#{RJS_ANY_ID}, \\{ #{insertion}: #{RJS_PATTERN_HTML} \\}\\)"
+  JQUERY_INSERTIONS = ["prepend", "append", "before", "after"]
+  RJS_INSERTIONS.each do |position|
+    insertion = position
+    insertion = 'append' if insertion == 'bottom'
+    insertion = 'prepend' if insertion == 'top'
+    RJS_STATEMENTS["insert_#{position}".to_sym] = "\\$\\(#{RJS_ANY_ID}\\)\\.#{insertion}\\(#{RJS_PATTERN_HTML}\\)"
   end
-  RJS_STATEMENTS[:insert_html] = "Element.insert\\(#{RJS_ANY_ID}, \\{ (#{RJS_INSERTIONS.join('|')}): #{RJS_PATTERN_HTML} \\}\\)"
+  RJS_STATEMENTS[:insert_html] = "\\$\\(#{RJS_ANY_ID}\\)\\.(#{JQUERY_INSERTIONS.join('|')})\\(#{RJS_PATTERN_HTML}\\)"
   RJS_STATEMENTS[:any] = Regexp.new("(#{RJS_STATEMENTS.values.join('|')})")
   RJS_PATTERN_UNICODE_ESCAPED_CHAR = /\\u([0-9a-zA-Z]{4})/
 

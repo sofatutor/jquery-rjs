@@ -322,7 +322,10 @@ module ActionView
           #   page.insert_html :bottom, 'list', '<li>Last item</li>'
           #
           def insert_html(position, id, *options_for_render)
-            call "jQuery(\"#{jquery_id(id)}\").#{position == :top ? 'prepend' : 'append'}", render(*options_for_render)
+            insertion = position.to_s.downcase
+            insertion = 'append' if insertion == 'bottom'
+            insertion = 'prepend' if insertion == 'top'
+            call "$(\"#{jquery_id(id)}\").#{insertion}", render(*options_for_render)
             # content = javascript_object_for(render(*options_for_render))
             # record "Element.insert(\"#{id}\", { #{position.to_s.downcase}: #{content} });"
           end
@@ -338,7 +341,7 @@ module ActionView
           #   page.replace_html 'person-45', :partial => 'person', :object => @person
           #
           def replace_html(id, *options_for_render)
-            call "jQuery(\"#{jquery_id(id)}\").html", render(*options_for_render)
+            call "$(\"#{jquery_id(id)}\").html", render(*options_for_render)
             # call 'Element.update', id, render(*options_for_render)
           end
 
@@ -373,7 +376,7 @@ module ActionView
           #   page.replace 'person_45', :partial => 'person', :object => @person
           #
           def replace(id, *options_for_render)
-            call "jQuery(\"#{jquery_id(id)}\").replaceWith", render(*options_for_render)
+            call "$(\"#{jquery_id(id)}\").replaceWith", render(*options_for_render)
             #call 'Element.replace', id, render(*options_for_render)
           end
 
@@ -386,7 +389,7 @@ module ActionView
           #  page.remove 'person_23', 'person_9', 'person_2'
           #
           def remove(*ids)
-            call "jQuery(\"#{jquery_ids(ids)}\").remove"
+            call "$(\"#{jquery_ids(ids)}\").remove"
             #loop_on_multiple_args 'Element.remove', ids
           end
 
@@ -399,7 +402,7 @@ module ActionView
           #  page.show 'person_6', 'person_13', 'person_223'
           #
           def show(*ids)
-            call "jQuery(\"#{jquery_ids(ids)}\").show"
+            call "$(\"#{jquery_ids(ids)}\").show"
             #loop_on_multiple_args 'Element.show', ids
           end
 
@@ -412,7 +415,7 @@ module ActionView
           #  page.hide 'person_29', 'person_9', 'person_0'
           #
           def hide(*ids)
-            call "jQuery(\"#{jquery_ids(ids)}\").hide"
+            call "$(\"#{jquery_ids(ids)}\").hide"
             #loop_on_multiple_args 'Element.hide', ids
           end
 
@@ -425,7 +428,7 @@ module ActionView
           #  page.toggle 'person_14', 'person_12', 'person_23'      # Shows the previously hidden elements
           #
           def toggle(*ids)
-            call "jQuery(\"#{jquery_ids(ids)}\").toggle"
+            call "$(\"#{jquery_ids(ids)}\").toggle"
             #loop_on_multiple_args 'Element.toggle', ids
           end
 
@@ -869,7 +872,7 @@ module ActionView
 
     class JavaScriptElementCollectionProxy < JavaScriptCollectionProxy #:nodoc:\
       def initialize(generator, pattern)
-        super(generator, "$$(#{::ActiveSupport::JSON.encode(pattern)})")
+        super(generator, "$(#{::ActiveSupport::JSON.encode(pattern)})")
       end
     end
   end

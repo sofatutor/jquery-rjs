@@ -18,8 +18,8 @@ require 'action_controller'
 require 'action_view'
 require 'action_view/testing/resolvers'
 
-require 'prototype-rails/on_load_action_controller'
-require 'prototype-rails/on_load_action_view'
+require 'jquery-rjs/on_load_action_controller'
+require 'jquery-rjs/on_load_action_view'
 
 FIXTURE_LOAD_PATH = File.join(File.dirname(__FILE__), 'fixtures')
 FIXTURES = Pathname.new(FIXTURE_LOAD_PATH)

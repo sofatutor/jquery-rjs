@@ -17,6 +17,6 @@ class RenderJSTest < ActionController::TestCase
 
   def test_render_with_default_from_accept_header
     xhr :get, :greeting
-    assert_equal "$(\"body\").visualEffect(\"highlight\");", @response.body
+    assert_equal "$(\"#body\").visualEffect(\"highlight\");", @response.body
   end
 end

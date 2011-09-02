@@ -18,7 +18,32 @@ module ActionView
     # See the documentation at http://script.aculo.us for more information on
     # using these helpers in your application.
     module JqueryUiHelper
-      TOGGLE_EFFECTS = [:toggle_appear, :toggle_slide, :toggle_blind]
+      SCRIPTACULOUS_EFFECTS = {
+        :appear => {:method => 'fade', :mode => 'show'},
+        :blind_down => {:method => 'blind', :mode => 'show', :options => {:direction => 'vertical'}},
+        :blind_up => {:method => 'blind', :mode => 'hide', :options => {:direction => 'vertical'}},
+        :blind_right => {:method => 'blind', :mode => 'show', :options => {:direction => 'horizontal'}},
+        :blind_left => {:method => 'blind', :mode => 'hide', :options => {:direction => 'horizontal'}},
+        :bounce_in => {:method => 'bounce', :mode => 'show', :options => {:direction => 'up'}},
+        :bounce_out => {:method => 'bounce', :mode => 'hide', :options => {:direction => 'up'}},
+        :drop_in => {:method => 'drop', :mode => 'show', :options => {:direction => 'up'}},
+        :drop_out => {:method => 'drop', :mode => 'hide', :options => {:direction => 'down'}},
+        :fade => {:method => 'fade', :mode => 'hide'},
+        :fold_in => {:method => 'fold', :mode => 'hide'},
+        :fold_out => {:method => 'fold', :mode => 'show'},
+        :grow => {:method => 'scale', :mode => 'show'},
+        :shrink => {:method => 'scale', :mode => 'hide'},
+        :slide_down => {:method => 'slide', :mode => 'show', :options => {:direction => 'up'}},
+        :slide_up => {:method => 'slide', :mode => 'hide', :options => {:direction => 'up'}},
+        :slide_right => {:method => 'slide', :mode => 'show', :options => {:direction => 'left'}},
+        :slide_left => {:method => 'slide', :mode => 'hide', :options => {:direction => 'left'}},
+        :squish => {:method => 'scale', :mode => 'hide', :options => {:origin => "['top','left']"}},
+        :switch_on => {:method => 'clip', :mode => 'show', :options => {:direction => 'vertical'}},
+        :switch_off => {:method => 'clip', :mode => 'hide', :options => {:direction => 'vertical'}},
+        :toggle_appear => {:method => 'fade', :mode => 'toggle'},
+        :toggle_slide => {:method => 'slide', :mode => 'toggle', :options => {:direction => 'up'}},
+        :toggle_blind => {:method => 'blind', :mode => 'toggle', :options => {:direction => 'vertical'}},
+      }
 
       # Returns a JavaScript snippet to be used on the Ajax callbacks for
       # starting visual effects.
@@ -39,23 +64,33 @@ module ActionView
       # You can change the behaviour with various options, see
       # http://script.aculo.us for more documentation.
       def visual_effect(name, element_id = false, js_options = {})
-        element = element_id ? ActiveSupport::JSON.encode(element_id) : "element"
+        element = element_id ? ActiveSupport::JSON.encode(jquery_id(element_id)) : "this"
 
+        if SCRIPTACULOUS_EFFECTS.has_key? name.to_sym
+          effect = SCRIPTACULOUS_EFFECTS[name.to_sym]
+          name = effect[:method]
+          mode = effect[:mode]
+          js_options = js_options.merge(effect[:options]) if effect[:options]
+        end
+        
         js_options[:queue] = if js_options[:queue].is_a?(Hash)
           '{' + js_options[:queue].map {|k, v| k == :limit ? "#{k}:#{v}" : "#{k}:'#{v}'" }.join(',') + '}'
         elsif js_options[:queue]
           "'#{js_options[:queue]}'"
         end if js_options[:queue]
-
-        [:endcolor, :direction, :startcolor, :scaleMode, :restorecolor].each do |option|
+        
+        [:color, :direction, :startcolor, :endcolor].each do |option|
           js_options[option] = "'#{js_options[option]}'" if js_options[option]
         end
+        
+        js_options[:duration] = (js_options[:duration] * 1000).to_i if js_options.has_key? :duration
+        
+        #if ['fadeIn','fadeOut','fadeToggle'].include?(name)
+        #  "$(\"#{jquery_id(element_id)}\").#{name}();"
+        #else
+          "$(#{element}).#{mode || "effect"}(\"#{name}\",#{options_for_javascript(js_options)});"
+        #end
 
-        if TOGGLE_EFFECTS.include? name.to_sym
-          "Effect.toggle(#{element},'#{name.to_s.gsub(/^toggle_/,'')}',#{options_for_javascript(js_options)});"
-        else
-          "new Effect.#{name.to_s.camelize}(#{element},#{options_for_javascript(js_options)});"
-        end
       end
 
       # Makes the element with the DOM ID specified by +element_id+ sortable
@@ -136,7 +171,7 @@ module ActionView
       def sortable_element_js(element_id, options = {}) #:nodoc:
         options[:with]     ||= "Sortable.serialize(#{ActiveSupport::JSON.encode(element_id)})"
         options[:onUpdate] ||= "function(){" + remote_function(options) + "}"
-        options.delete_if { |key, value| PrototypeHelper::AJAX_OPTIONS.include?(key) }
+        options.delete_if { |key, value| JqueryHelper::AJAX_OPTIONS.include?(key) }
 
         [:tag, :overlap, :constraint, :handle].each do |option|
           options[option] = "'#{options[option]}'" if options[option]
@@ -207,7 +242,7 @@ module ActionView
       def drop_receiving_element_js(element_id, options = {}) #:nodoc:
         options[:with]     ||= "'id=' + encodeURIComponent(element.id)"
         options[:onDrop]   ||= "function(element){" + remote_function(options) + "}"
-        options.delete_if { |key, value| PrototypeHelper::AJAX_OPTIONS.include?(key) }
+        options.delete_if { |key, value| JqueryHelper::AJAX_OPTIONS.include?(key) }
 
         options[:accept] = array_or_string_for_javascript(options[:accept]) if options[:accept]
         options[:hoverclass] = "'#{options[:hoverclass]}'" if options[:hoverclass]

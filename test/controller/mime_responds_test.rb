@@ -161,14 +161,14 @@ class RespondToControllerTest < ActionController::TestCase
     @request.accept = "text/javascript"
     get :using_defaults
     assert_equal "text/javascript", @response.content_type
-    assert_equal '$("body").visualEffect("highlight");', @response.body
+    assert_equal '$("#body").visualEffect("highlight");', @response.body
   end
 
   def test_using_defaults_with_type_list
     @request.accept = "text/javascript"
     get :using_defaults_with_type_list
     assert_equal "text/javascript", @response.content_type
-    assert_equal '$("body").visualEffect("highlight");', @response.body
+    assert_equal '$("#body").visualEffect("highlight");', @response.body
   end
 
   def test_rjs_type_skips_layout
@@ -179,7 +179,7 @@ class RespondToControllerTest < ActionController::TestCase
 
   def test_xhr
     xhr :get, :using_defaults
-    assert_equal '$("body").visualEffect("highlight");', @response.body
+    assert_equal '$("#body").visualEffect("highlight");', @response.body
   end
 end
 
@@ -208,6 +208,6 @@ class RespondWithControllerTest < ActionController::TestCase
     @request.accept = "text/javascript"
     get :using_resource
     assert_equal "text/javascript", @response.content_type
-    assert_equal '$("body").visualEffect("highlight");', @response.body
+    assert_equal '$("#body").visualEffect("highlight");', @response.body
   end
 end

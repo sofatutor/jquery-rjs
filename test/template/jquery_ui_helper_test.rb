@@ -1,7 +1,7 @@
 require 'abstract_unit'
 
-class ScriptaculousHelperTest < ActionView::TestCase
-  tests ActionView::Helpers::ScriptaculousHelper
+class JqueryUiHelperTest < ActionView::TestCase
+  tests ActionView::Helpers::JqueryUiHelper
 
   def url_for(options)
     url =  "http://www.example.com/"
@@ -10,14 +10,14 @@ class ScriptaculousHelperTest < ActionView::TestCase
   end
 
   def test_effect
-    assert_equal "new Effect.Highlight(\"posts\",{});", visual_effect(:highlight, "posts")
-    assert_equal "new Effect.Highlight(\"posts\",{});", visual_effect("highlight", :posts)
-    assert_equal "new Effect.Highlight(\"posts\",{});", visual_effect(:highlight, :posts)
-    assert_equal "new Effect.Fade(\"fademe\",{duration:4.0});", visual_effect(:fade, "fademe", :duration => 4.0)
-    assert_equal "new Effect.Shake(element,{});", visual_effect(:shake)
-    assert_equal "new Effect.DropOut(\"dropme\",{queue:'end'});", visual_effect(:drop_out, 'dropme', :queue => :end)
-    assert_equal "new Effect.Highlight(\"status\",{endcolor:'#EEEEEE'});", visual_effect(:highlight, 'status', :endcolor => '#EEEEEE')
-    assert_equal "new Effect.Highlight(\"status\",{restorecolor:'#500000', startcolor:'#FEFEFE'});", visual_effect(:highlight, 'status', :restorecolor => '#500000', :startcolor => '#FEFEFE')
+    assert_equal "$(\"#posts\").effect(\"highlight\",{});", visual_effect(:highlight, "posts")
+    assert_equal "$(\"#posts\").effect(\"highlight\",{});", visual_effect("highlight", :posts)
+    assert_equal "$(\"#posts\").effect(\"highlight\",{});", visual_effect(:highlight, :posts)
+    assert_equal "$(\"#fademe\").hide(\"fade\",{duration:4000});", visual_effect(:fade, "fademe", :duration => 4.0)
+    assert_equal "$(this).effect(\"shake\",{});", visual_effect(:shake)
+    assert_equal "$(\"#dropme\").hide(\"drop\",{direction:'down', queue:'end'});", visual_effect(:drop_out, 'dropme', :queue => :end)
+    assert_equal "$(\"#status\").effect(\"highlight\",{endcolor:'#EEEEEE'});", visual_effect(:highlight, 'status', :endcolor => '#EEEEEE')
+    assert_equal "$(\"#status\").effect(\"highlight\",{restorecolor:#500000, startcolor:'#FEFEFE'});", visual_effect(:highlight, 'status', :restorecolor => '#500000', :startcolor => '#FEFEFE')
 
     # chop the queue params into a comma separated list
     beginning, ending = 'new Effect.DropOut("dropme",{queue:{', '}});'
@@ -40,12 +40,12 @@ class ScriptaculousHelperTest < ActionView::TestCase
   end
 
   def test_toggle_effects
-    assert_equal "Effect.toggle(\"posts\",'appear',{});", visual_effect(:toggle_appear,  "posts")
-    assert_equal "Effect.toggle(\"posts\",'slide',{});",  visual_effect(:toggle_slide,   "posts")
-    assert_equal "Effect.toggle(\"posts\",'blind',{});",  visual_effect(:toggle_blind,   "posts")
-    assert_equal "Effect.toggle(\"posts\",'appear',{});", visual_effect("toggle_appear", "posts")
-    assert_equal "Effect.toggle(\"posts\",'slide',{});",  visual_effect("toggle_slide",  "posts")
-    assert_equal "Effect.toggle(\"posts\",'blind',{});",  visual_effect("toggle_blind",  "posts")
+    assert_equal "$(\"#posts\").toggle(\"fade\",{});", visual_effect(:toggle_appear,  "posts")
+    assert_equal "$(\"#posts\").toggle(\"slide\",{direction:'up'});",  visual_effect(:toggle_slide,   "posts")
+    assert_equal "$(\"#posts\").toggle(\"blind\",{direction:'vertical'});",  visual_effect(:toggle_blind,   "posts")
+    assert_equal "$(\"#posts\").toggle(\"fade\",{});", visual_effect("toggle_appear", "posts")
+    assert_equal "$(\"#posts\").toggle(\"slide\",{direction:'up'});",  visual_effect("toggle_slide",  "posts")
+    assert_equal "$(\"#posts\").toggle(\"blind\",{direction:'vertical'});",  visual_effect("toggle_blind",  "posts")
   end
 
 

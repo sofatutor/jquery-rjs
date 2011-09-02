@@ -142,51 +142,51 @@ class JavaScriptGeneratorTest < PrototypeHelperBaseTest
   def _evaluate_assigns_and_ivars() end
 
   def test_insert_html_with_string
-    assert_equal 'Element.insert("element", { top: "\\u003Cp\\u003EThis is a test\\u003C/p\\u003E" });',
+    assert_equal '$("#element").prepend("\\u003Cp\\u003EThis is a test\\u003C/p\\u003E");',
       @generator.insert_html(:top, 'element', '<p>This is a test</p>')
-    assert_equal 'Element.insert("element", { bottom: "\\u003Cp\u003EThis is a test\\u003C/p\u003E" });',
+    assert_equal '$("#element").append("\\u003Cp\u003EThis is a test\\u003C/p\u003E");',
       @generator.insert_html(:bottom, 'element', '<p>This is a test</p>')
-    assert_equal 'Element.insert("element", { before: "\\u003Cp\u003EThis is a test\\u003C/p\u003E" });',
+    assert_equal '$("#element").before("\\u003Cp\u003EThis is a test\\u003C/p\u003E");',
       @generator.insert_html(:before, 'element', '<p>This is a test</p>')
-    assert_equal 'Element.insert("element", { after: "\\u003Cp\u003EThis is a test\\u003C/p\u003E" });',
+    assert_equal '$("#element").after("\\u003Cp\u003EThis is a test\\u003C/p\u003E");',
       @generator.insert_html(:after, 'element', '<p>This is a test</p>')
   end
 
   def test_replace_html_with_string
-    assert_equal 'Element.update("element", "\\u003Cp\\u003EThis is a test\\u003C/p\\u003E");',
+    assert_equal '$("#element").html("\\u003Cp\\u003EThis is a test\\u003C/p\\u003E");',
       @generator.replace_html('element', '<p>This is a test</p>')
   end
 
   def test_replace_element_with_string
-    assert_equal 'Element.replace("element", "\\u003Cdiv id=\"element\"\\u003E\\u003Cp\\u003EThis is a test\\u003C/p\\u003E\\u003C/div\\u003E");',
+    assert_equal '$("#element").replaceWith("\\u003Cdiv id=\"element\"\\u003E\\u003Cp\\u003EThis is a test\\u003C/p\\u003E\\u003C/div\\u003E");',
       @generator.replace('element', '<div id="element"><p>This is a test</p></div>')
   end
 
   def test_remove
-    assert_equal 'Element.remove("foo");',
+    assert_equal '$("#foo").remove();',
       @generator.remove('foo')
-    assert_equal '["foo","bar","baz"].each(Element.remove);',
+    assert_equal '$("#foo,#bar,#baz").remove();',
       @generator.remove('foo', 'bar', 'baz')
   end
 
   def test_show
-    assert_equal 'Element.show("foo");',
+    assert_equal '$("#foo").show();',
       @generator.show('foo')
-    assert_equal '["foo","bar","baz"].each(Element.show);',
+    assert_equal '$("#foo,#bar,#baz").show();',
       @generator.show('foo', 'bar', 'baz')
   end
 
   def test_hide
-    assert_equal 'Element.hide("foo");',
+    assert_equal '$("#foo").hide();',
       @generator.hide('foo')
-    assert_equal '["foo","bar","baz"].each(Element.hide);',
+    assert_equal '$("#foo,#bar,#baz").hide();',
       @generator.hide('foo', 'bar', 'baz')
   end
 
   def test_toggle
-    assert_equal 'Element.toggle("foo");',
+    assert_equal '$("#foo").toggle();',
       @generator.toggle('foo')
-    assert_equal '["foo","bar","baz"].each(Element.toggle);',
+    assert_equal '$("#foo,#bar,#baz").toggle();',
       @generator.toggle('foo', 'bar', 'baz')
   end
 
@@ -211,7 +211,7 @@ class JavaScriptGeneratorTest < PrototypeHelperBaseTest
       @generator.hide('foo')
     end
 
-    assert_equal "setTimeout(function() {\n;\nElement.hide(\"foo\");\n}, 20000);", @generator.to_s
+    assert_equal "setTimeout(function() {\n;\n$(\"#foo\").hide();\n}, 20000);", @generator.to_s
   end
 
   def test_to_s
@@ -221,54 +221,54 @@ class JavaScriptGeneratorTest < PrototypeHelperBaseTest
     @generator.replace_html('baz', '<p>This is a test</p>')
 
     assert_equal <<-EOS.chomp, @generator.to_s
-Element.insert("element", { top: "\\u003Cp\\u003EThis is a test\\u003C/p\\u003E" });
-Element.insert("element", { bottom: "\\u003Cp\\u003EThis is a test\\u003C/p\\u003E" });
-["foo","bar"].each(Element.remove);
-Element.update("baz", "\\u003Cp\\u003EThis is a test\\u003C/p\\u003E");
+$("#element").prepend("\\u003Cp\\u003EThis is a test\\u003C/p\\u003E");
+$("#element").append("\\u003Cp\\u003EThis is a test\\u003C/p\\u003E");
+$("#foo,#bar").remove();
+$("#baz").html("\\u003Cp\\u003EThis is a test\\u003C/p\\u003E");
     EOS
   end
 
   def test_element_access
-    assert_equal %($("hello");), @generator['hello']
+    assert_equal %($("#hello");), @generator['hello']
   end
 
   def test_element_access_on_records
-    assert_equal %($("bunny_5");),   @generator[Bunny.new(:id => 5)]
-    assert_equal %($("new_bunny");), @generator[Bunny.new]
+    assert_equal %($("#bunny_5");),   @generator[Bunny.new(:id => 5)]
+    assert_equal %($("#new_bunny");), @generator[Bunny.new]
   end
 
   def test_element_proxy_one_deep
     @generator['hello'].hide
-    assert_equal %($("hello").hide();), @generator.to_s
+    assert_equal %($("#hello").hide();), @generator.to_s
   end
 
   def test_element_proxy_variable_access
     @generator['hello']['style']
-    assert_equal %($("hello").style;), @generator.to_s
+    assert_equal %($("#hello").style;), @generator.to_s
   end
 
   def test_element_proxy_variable_access_with_assignment
     @generator['hello']['style']['color'] = 'red'
-    assert_equal %($("hello").style.color = "red";), @generator.to_s
+    assert_equal %($("#hello").style.color = "red";), @generator.to_s
   end
 
   def test_element_proxy_assignment
     @generator['hello'].width = 400
-    assert_equal %($("hello").width = 400;), @generator.to_s
+    assert_equal %($("#hello").width = 400;), @generator.to_s
   end
 
   def test_element_proxy_two_deep
     @generator['hello'].hide("first").clean_whitespace
-    assert_equal %($("hello").hide("first").cleanWhitespace();), @generator.to_s
+    assert_equal %($("#hello").hide("first").cleanWhitespace();), @generator.to_s
   end
 
   def test_select_access
-    assert_equal %($$("div.hello");), @generator.select('div.hello')
+    assert_equal %($("div.hello");), @generator.select('div.hello')
   end
 
   def test_select_proxy_one_deep
     @generator.select('p.welcome b').first.hide
-    assert_equal %($$("p.welcome b").first().hide();), @generator.to_s
+    assert_equal %($("p.welcome b").first().hide();), @generator.to_s
   end
 
   def test_visual_effect
@@ -304,8 +304,8 @@ Element.update("baz", "\\u003Cp\\u003EThis is a test\\u003C/p\\u003E");
     @generator.select('p.welcome b').first.hide()
     @generator.select('p.welcome b').last.show()
     assert_equal <<-EOS.strip, @generator.to_s
-$$("p.welcome b").first().hide();
-$$("p.welcome b").last().show();
+$("p.welcome b").first().hide();
+$("p.welcome b").last().show();
       EOS
   end
 
@@ -317,10 +317,10 @@ $$("p.welcome b").last().show();
       @generator.visual_effect :highlight, value
     end
     assert_equal <<-EOS.strip, @generator.to_s
-$$("p.welcome b").each(function(value, index) {
+$("p.welcome b").each(function(value, index) {
 value.removeClassName("selected");
 });
-$$("p.welcome b").each(function(value, index) {
+$("p.welcome b").each(function(value, index) {
 new Effect.Highlight(value,{});
 });
       EOS
@@ -330,10 +330,10 @@ new Effect.Highlight(value,{});
     @generator.select('p').collect('a') { |para| para.show }
     @generator.select('p').collect { |para| para.hide }
     assert_equal <<-EOS.strip, @generator.to_s
-var a = $$("p").collect(function(value, index) {
+var a = $("p").collect(function(value, index) {
 return value.show();
 });
-$$("p").collect(function(value, index) {
+$("p").collect(function(value, index) {
 return value.hide();
 });
     EOS
@@ -350,10 +350,10 @@ return value.hide();
     end
 
     assert_equal <<-EOS.strip, @generator.to_s
-var a = $$("p").grep(/^a/, function(value, index) {
+var a = $("p").grep(/^a/, function(value, index) {
 return (value.className == "welcome");
 });
-var b = $$("p").grep(/b$/, function(value, index) {
+var b = $("p").grep(/b$/, function(value, index) {
 alert(value);
 return (value.className == "welcome");
 });
@@ -370,10 +370,10 @@ return (value.className == "welcome");
     end
 
     assert_equal <<-EOS.strip, @generator.to_s
-var a = $$("p").inject([], function(memo, value, index) {
+var a = $("p").inject([], function(memo, value, index) {
 return (value.className == "welcome");
 });
-var b = $$("p").inject(null, function(memo, value, index) {
+var b = $("p").inject(null, function(memo, value, index) {
 alert(memo);
 return (value.className == "welcome");
 });
@@ -382,7 +382,7 @@ return (value.className == "welcome");
 
   def test_collection_proxy_with_pluck
     @generator.select('p').pluck('a', 'className')
-    assert_equal %(var a = $$("p").pluck("className");), @generator.to_s
+    assert_equal %(var a = $("p").pluck("className");), @generator.to_s
   end
 
   def test_collection_proxy_with_zip
@@ -405,7 +405,7 @@ return array.reverse();
     end
 
     assert_equal <<-EOS.strip, @generator.to_s
-var a = $$("p").findAll(function(value, index) {
+var a = $("p").findAll(function(value, index) {
 return (value.className == "welcome");
 });
     EOS
@@ -415,8 +415,8 @@ return (value.className == "welcome");
     @generator.select('p').in_groups_of('a', 3)
     @generator.select('p').in_groups_of('a', 3, 'x')
     assert_equal <<-EOS.strip, @generator.to_s
-var a = $$("p").inGroupsOf(3);
-var a = $$("p").inGroupsOf(3, "x");
+var a = $("p").inGroupsOf(3);
+var a = $("p").inGroupsOf(3, "x");
     EOS
   end
 
@@ -427,8 +427,8 @@ var a = $$("p").inGroupsOf(3, "x");
     end
 
     assert_equal <<-EOS.strip, @generator.to_s
-var a = $$("p").eachSlice(3);
-var a = $$("p").eachSlice(3, function(value, index) {
+var a = $("p").eachSlice(3);
+var a = $("p").eachSlice(3, function(value, index) {
 return value.reverse();
 });
     EOS
@@ -437,7 +437,7 @@ return value.reverse();
   def test_debug_rjs
     ActionView::Base.debug_rjs = true
     @generator['welcome'].replace_html 'Welcome'
-    assert_equal "try {\n$(\"welcome\").update(\"Welcome\");\n} catch (e) { alert('RJS error:\\n\\n' + e.toString()); alert('$(\\\"welcome\\\").update(\\\"Welcome\\\");'); throw e }", @generator.to_s
+    assert_equal "try {\n$(\"#welcome\").html(\"Welcome\");\n} catch (e) { alert('RJS error:\\n\\n' + e.toString()); alert('$(\\\"#welcome\\\").html(\\\"Welcome\\\");'); throw e }", @generator.to_s
   ensure
     ActionView::Base.debug_rjs = false
   end
@@ -463,7 +463,7 @@ return value.reverse();
     @generator.call(:my_method_with_arguments, true, "hello") do |p|
       p[:three].visual_effect(:highlight)
     end
-    assert_equal "before();\nmy_method(function() { $(\"one\").show();\n$(\"two\").hide(); });\nin_between();\nmy_method_with_arguments(true, \"hello\", function() { $(\"three\").visualEffect(\"highlight\"); });", @generator.to_s
+    assert_equal "before();\nmy_method(function() { $(\"#one\").show();\n$(\"#two\").hide(); });\nin_between();\nmy_method_with_arguments(true, \"hello\", function() { $(\"#three\").visualEffect(\"highlight\"); });", @generator.to_s
   end
 
   def test_class_proxy_call_with_block
@@ -471,6 +471,6 @@ return value.reverse();
       p[:one].show
       p[:two].hide
     end
-    assert_equal "MyObject.myMethod(function() { $(\"one\").show();\n$(\"two\").hide(); });", @generator.to_s
+    assert_equal "MyObject.myMethod(function() { $(\"#one\").show();\n$(\"#two\").hide(); });", @generator.to_s
   end
 end
