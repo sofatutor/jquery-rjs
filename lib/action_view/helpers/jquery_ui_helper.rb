@@ -18,6 +18,15 @@ module ActionView
     # See the documentation at http://script.aculo.us for more information on
     # using these helpers in your application.
     module JqueryUiHelper
+      
+      def jquery_id(id) #:nodoc:
+        id.to_s.count('#.*,>+~:[/ ') == 0 ? "##{id}" : id
+      end
+      
+      def jquery_ids(ids) #:nodoc:
+        Array(ids).map{|id| jquery_id(id)}.join(',')
+      end
+          
       SCRIPTACULOUS_EFFECTS = {
         :appear => {:method => 'fade', :mode => 'show'},
         :blind_down => {:method => 'blind', :mode => 'show', :options => {:direction => 'vertical'}},
@@ -263,7 +272,7 @@ module ActionView
         end
     end
 
-    module PrototypeHelper
+    module JqueryHelper
       class JavaScriptGenerator
         module GeneratorMethods
           # Starts a script.aculo.us visual effect. See

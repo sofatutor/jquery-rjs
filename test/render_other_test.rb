@@ -201,17 +201,17 @@ class RenderOtherTest < ActionController::TestCase
 
   def test_render_rjs_template_explicitly
     get :render_js_with_explicit_template
-    assert_equal %!$("#person").remove();\nnew Effect.Highlight(\"project-4\",{});!, @response.body
+    assert_equal %!$("#person").remove();\n$(\"#project-4\").effect(\"highlight\",{});!, @response.body
   end
 
   def test_rendering_rjs_action_explicitly
     get :render_js_with_explicit_action_template
-    assert_equal %!$("#person").remove();\nnew Effect.Highlight(\"project-4\",{});!, @response.body
+    assert_equal %!$("#person").remove();\n$(\"#project-4\").effect(\"highlight\",{});!, @response.body
   end
 
   def test_render_rjs_with_default
     get :delete_with_js
-    assert_equal %!$("#person").remove();\nnew Effect.Highlight(\"project-4\",{});!, @response.body
+    assert_equal %!$("#person").remove();\n$(\"#project-4\").effect(\"highlight\",{});!, @response.body
   end
 
   def test_update_page

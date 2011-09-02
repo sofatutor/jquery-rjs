@@ -272,12 +272,12 @@ $("#baz").html("\\u003Cp\\u003EThis is a test\\u003C/p\\u003E");
   end
 
   def test_visual_effect
-    assert_equal %(new Effect.Puff("blah",{});),
+    assert_equal %($(\"#blah\").effect(\"puff\",{});),
       @generator.visual_effect(:puff,'blah')
   end
 
   def test_visual_effect_toggle
-    assert_equal %(Effect.toggle("blah",'appear',{});),
+    assert_equal %($(\"#blah\").toggle(\"fade\",{});),
       @generator.visual_effect(:toggle_appear,'blah')
   end
 
