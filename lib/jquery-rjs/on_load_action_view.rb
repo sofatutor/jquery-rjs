@@ -14,9 +14,15 @@ ActionView::Base.class_eval do
   include ActionView::Helpers::JqueryUiHelper
 end
 
-ActionView::TestCase.class_eval do
-  include ActionView::Helpers::JqueryHelper
-  include ActionView::Helpers::JqueryUiHelper
+
+
+
+
+if Rails.env.test?
+  ActionView::TestCase.class_eval do
+    include ActionView::Helpers::JqueryHelper
+    include ActionView::Helpers::JqueryUiHelper    
+  end
 end
 
 ActionView::Template.register_template_handler :rjs, ActionView::Template::Handlers::RJS.new
