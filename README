@@ -1,3 +1,12 @@
++++++++++++++++++++++
+jquery-rjs  merge for rails 3.2.2
+
+add   ActionView::Base.debug_rjs = true  to your  app/controllers/application_controller.rb
+add   // = require jquery-ui             to your  app/assets/javascripts/application.js
++++++++++++++++++++++
+
+
+
 prototype-rails provides Prototype, Scriptaculous, and RJS for Rails 3.1.
 
 Prototype and Scriptaculous are provided via the asset pipeline and you
