@@ -137,7 +137,7 @@ module ActionView
         function = "#{options[:before]}; #{function}" if options[:before]
         function = "#{function}; #{options[:after]}"  if options[:after]
         function = "if (#{options[:condition]}) { #{function}; }" if options[:condition]
-        function = "if (confirm('#{escape_javascript(options[:confirm])}')) { #{function}; }" if options[:confirm]
+        function = "if (confirm('#{escape_javascript(options[:confirm] || options[:data][:confirm])}')) { #{function}; }" if options[:confirm] || options[:data][:confirm]
 
         return function.html_safe
       end
