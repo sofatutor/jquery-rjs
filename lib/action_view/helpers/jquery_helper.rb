@@ -233,7 +233,7 @@ module ActionView
                 javascript.replace "try {\n#{source}\n} catch (e) "
                 javascript << "{ alert('RJS error:\\n\\n' + e.toString()); alert('#{source.gsub('\\','\0\0').gsub(/\r\n|\n|\r/, "\\n").gsub(/["']/) { |m| "\\#{m}" }}'); throw e }"
               end
-            end
+            end.gsub("\xe2\x80\xa8", '\u2028').gsub("\xe2\x80\xa9", '\u2029') # fix for UTF-8 line terminators
           end
           
           def jquery_id(id) #:nodoc:
