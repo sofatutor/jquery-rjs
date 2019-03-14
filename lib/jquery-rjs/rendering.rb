@@ -1,13 +1,17 @@
-require 'action_view/helpers/rendering_helper'
+require 'action_view/helpers'
 
-ActionView::Helpers::RenderingHelper.module_eval do
-  def render_with_update(options = {}, locals = {}, &block)
-    if options == :update
-      update_page(&block)
-    else
-      render_without_update(options, locals, &block)
+module ActionView
+  module Helpers
+    module RenderUpdate
+      def render(options = {}, locals = {}, &block)
+        if options == :update
+          update_page(&block)
+        else
+          super
+        end
+      end
     end
+
+    include RenderUpdate
   end
-  
-  alias_method_chain :render, :update
 end

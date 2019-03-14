@@ -3,7 +3,7 @@ require 'pathname'
 require 'securerandom'
 
 ActionController.add_renderer :simon do |says, options|
-  self.content_type  = Mime::TEXT
+  self.content_type  = Mime[:text]
   self.response_body = "Simon says: #{says}"
 end
 
