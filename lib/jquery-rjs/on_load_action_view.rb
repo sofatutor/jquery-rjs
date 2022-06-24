@@ -19,9 +19,12 @@ end
 
 
 if Rails.env.test?
-  ActionView::TestCase.class_eval do
-    include ActionView::Helpers::JqueryHelper
-    include ActionView::Helpers::JqueryUiHelper    
+  Rails.application.reloader.to_prepare do
+    # ActionView::TestCase loads all helpers; make sure we delay this after app initialization is done.
+    ActionView::TestCase.class_eval do
+      include ActionView::Helpers::JqueryHelper
+      include ActionView::Helpers::JqueryUiHelper
+    end
   end
 end
 
