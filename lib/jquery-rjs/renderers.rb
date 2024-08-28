@@ -9,4 +9,15 @@ module ActionController
       self.response_body = generator.to_s
     end
   end
+
+  module Rendering
+    private
+
+    # This method was removed in Rails 7.1, but we need it for render :update to work.
+    def _normalize_args(action = nil, options = {}, &blk)
+      options = super
+      options[:update] = blk if block_given?
+      options
+    end
+  end
 end
